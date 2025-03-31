@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Скатерть самобранка</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        #animated-title {
+            font-size: 4rem;
+            color: #007bff;
+            animation: slide-in-out 3s infinite ease-in-out;
+        }
+        @keyframes slide-in-out {
+            0%, 100% { transform: translateX(-50px); }
+            50% { transform: translateX(50px); }
+        }
+        #search-input {
+            margin: 20px auto;
+            width: 300px;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #materialize-button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #materialize-button:hover {
+            background-color: #0056b3;
+        }
+        #image-container {
+            margin-top: 20px;
+        }
+        #image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="animated-title">Скатерть самобранка</h1>
+        <p class="lead">Проси что хочешь - материализую что хочешь.</p>
+        <input type="text" id="search-input" placeholder="Введите запрос..." />
+        <button id="materialize-button">Материализовать</button>
+        <div id="image-container"></div>
+    </div>
+
+    <script>
+        document.getElementById('materialize-button').addEventListener('click', async function () {
+            const query = document.getElementById('search-input').value.trim();
+            if (query === '') {
+                alert('Введите запрос!');
+                return;
+            }
+
+            // Очистка контейнера
+            document.getElementById('image-container').innerHTML = '';
+
+            try {
+                // URL поиска в Яндексе
+                const url = `https://yandex.com/images/search?text=${encodeURIComponent(query)}`;
+
+                // Получаем HTML страницы
+                const response = await fetch(url);
+                const html = await response.text();
+
+                // Парсим HTML с помощью cheerio.js
+                const $ = cheerio.load(html);
+
+                // Находим первую картинку
+                const imgSelector = '.serp-item__preview img'; // Селектор для картинок в Яндексе
+                const imgElement = $(imgSelector);
+
+                if (imgElement.length > 0) {
+                    const imageUrl = imgElement.attr('src');
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    imgElement.alt = query;
+                    document.getElementById('image-container').appendChild(imgElement);
+                } else {
+                    document.getElementById('image-container').innerHTML = '<p>Ничего не найдено!</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка при поиске изображения:', error);
+                document.getElementById('image-container').innerHTML = '<p>Произошла ошибка при материализации.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
