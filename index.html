@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Скатерть самобранка</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f8f9fa;
@@ -14,89 +16,205 @@
         #animated-title {
             font-size: 4rem;
             color: #007bff;
-            animation: slide-in-out 3s infinite ease-in-out;
+            animation: title-slide-in-out 3s infinite ease-in-out;
         }
-        @keyframes slide-in-out {
+        @keyframes title-slide-in-out {
             0%, 100% { transform: translateX(-50px); }
             50% { transform: translateX(50px); }
         }
-        #search-input {
-            margin: 20px auto;
-            width: 300px;
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        #status-message {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #007bff;
+            display: none;
         }
-        #materialize-button {
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #materialize-button:hover {
-            background-color: #0056b3;
-        }
-        #image-container {
+        #form-container {
             margin-top: 20px;
         }
-        #image-container img {
-            max-width: 100%;
-            height: auto;
+        #form-container label {
+            margin-right: 10px;
+        }
+        #form-container input {
+            margin-right: 10px;
+        }
+        #delivery-animation {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #ff6f00;
+            display: none;
+        }
+        #delivery-status {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #28a745;
+            display: none;
         }
     </style>
 </head>
 <body>
+    <div id="background-animation">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
     <div class="container">
         <h1 id="animated-title">Скатерть самобранка</h1>
         <p class="lead">Проси что хочешь - материализую что хочешь.</p>
-        <input type="text" id="search-input" placeholder="Введите запрос..." />
-        <button id="materialize-button">Материализовать</button>
-        <div id="image-container"></div>
+        <div id="form-container">
+            <label for="item-request">Что материализовать:</label>
+            <input type="text" id="item-request" placeholder="Введите запрос..." />
+            <button id="generate-item" class="btn btn-success">Сгенерировать</button>
+        </div>
+        <div id="delivery-animation" style="display: none;">
+            <p id="status-message">Материализация начата...</p>
+            <p id="status-message">Готовим материал...</p>
+            <p id="status-message">Очень сложная работа...</p>
+            <p id="status-message">Почти всё готово...</p>
+            <p id="status-message">Материализация завершена!</p>
+        </div>
+        <div id="delivery-form" style="display: none;">
+            <label for="address">Адрес:</label>
+            <input type="text" id="address" placeholder="Введите ваш адрес..." />
+            <label for="time">Время доставки:</label>
+            <select id="time">
+                <option value="10:00">10:00</option>
+                <option value="12:00">12:00</option>
+                <option value="14:00">14:00</option>
+                <option value="16:00">16:00</option>
+                <option value="18:00">18:00</option>
+                <option value="20:00">20:00</option>
+                <option value="22:00">22:00</option>
+                <option value="23:00">23:00</option>
+            </select>
+            <button id="submit-delivery" class="btn btn-success">Отправить курьера</button>
+        </div>
+        <div id="delivery-status" style="display: none;">
+            <p>Ожидайте курьера в назначеное время...</p>
+            <p>Время доставки: <span id="delivery-time"></span></p>
+            <p>Спасибо, что воспользовались нашим сервисом!</p>
+        </div>
     </div>
 
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('materialize-button').addEventListener('click', async function () {
-            const query = document.getElementById('search-input').value.trim();
+        // Анимация заголовка
+        let titleOffset = -50;
+        const titleAnimation = setInterval(() => {
+            const title = document.getElementById('animated-title');
+            if (titleOffset < 50) {
+                titleOffset += 10;
+                title.style.transform = `translateX(${titleOffset}px)`;
+            } else {
+                titleOffset = -50;
+                title.style.transform = `translateX(${titleOffset}px)`;
+            }
+        }, 200);
+
+        // Анимация точки на фоне
+        const backgroundAnimation = setInterval(() => {
+            const points = document.querySelectorAll('#background-animation div');
+            points.forEach(point => {
+                const randomTop = Math.random() * 100;
+                const randomLeft = Math.random() * 100;
+                point.style.top = `${randomTop}%`;
+                point.style.left = `${randomLeft}%`;
+            });
+        }, 1000);
+
+        document.getElementById('item-request').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                document.getElementById('generate-item').click();
+            }
+        });
+
+        document.getElementById('generate-item').addEventListener('click', function () {
+            const query = document.getElementById('item-request').value.trim();
             if (query === '') {
                 alert('Введите запрос!');
                 return;
             }
 
-            // Очистка контейнера
-            document.getElementById('image-container').innerHTML = '';
+            // Скрываем форму запроса
+            document.getElementById('form-container').style.display = 'none';
 
-            try {
-                // URL поиска в Яндексе
-                const url = `https://yandex.com/images/search?text=${encodeURIComponent(query)}`;
+            // Показываем анимацию работы системы
+            document.getElementById('delivery-animation').style.display = 'block';
 
-                // Получаем HTML страницы
-                const response = await fetch(url);
-                const html = await response.text();
+            // Имитация сложной работы
+            let statuses = [
+                'Материализация начата...',
+                'Готовим материал...',
+                'Очень сложная работа...',
+                'Почти всё готово...',
+                'Материализация завершена!'
+            ];
+            let statusIndex = 0;
+            const intervalId = setInterval(() => {
+                const statusMessage = document.getElementById('status-message');
+                statusMessage.textContent = statuses[statusIndex];
+                statusMessage.style.color = statuses[statusIndex] === 'Материализация завершена!' ? '#28a745' : '#007bff';
+                statusMessage.style.display = 'block'; // Показываем статус
 
-                // Парсим HTML с помощью cheerio.js
-                const $ = cheerio.load(html);
+                // Через 2-4 секунды скрываем статус
+                setTimeout(() => {
+                    statusMessage.style.display = 'none'; // Скрываем статус
+                }, Math.floor(Math.random() * 2000 + 2000));
 
-                // Находим первую картинку
-                const imgSelector = '.serp-item__preview img'; // Селектор для картинок в Яндексе
-                const imgElement = $(imgSelector);
+                statusIndex++;
+                if (statusIndex >= statuses.length) {
+                    clearInterval(intervalId);
 
-                if (imgElement.length > 0) {
-                    const imageUrl = imgElement.attr('src');
-                    const imgElement = document.createElement('img');
-                    imgElement.src = imageUrl;
-                    imgElement.alt = query;
-                    document.getElementById('image-container').appendChild(imgElement);
-                } else {
-                    document.getElementById('image-container').innerHTML = '<p>Ничего не найдено!</p>';
+                    // Показываем форму доставки
+                    document.getElementById('delivery-form').style.display = 'block';
                 }
-            } catch (error) {
-                console.error('Ошибка при поиске изображения:', error);
-                document.getElementById('image-container').innerHTML = '<p>Произошла ошибка при материализации.</p>';
+            }, Math.floor(Math.random() * 2000 + 2000)); // Случайное время от 2 до 4 секунд
+        });
+
+        document.getElementById('submit-delivery').addEventListener('click', function () {
+            const address = document.getElementById('address').value.trim();
+            const time = document.getElementById('time').value;
+
+            if (address === '') {
+                alert('Введите ваш адрес!');
+                return;
             }
+
+            // Скрываем форму доставки
+            document.getElementById('delivery-form').style.display = 'none';
+
+            // Показываем анимацию доставки
+            document.getElementById('delivery-animation').style.display = 'block';
+
+            // Имитация движения курьера
+            let deliveryStatuses = [
+                'Ищем свободного курьера...',
+                'Отправляем заказ...',
+                'Готово!'
+            ];
+            let deliveryStatusIndex = 0;
+            const deliveryIntervalId = setInterval(() => {
+                const statusMessage = document.getElementById('status-message');
+                statusMessage.textContent = deliveryStatuses[deliveryStatusIndex];
+                statusMessage.style.color = '#ff6f00';
+                statusMessage.style.display = 'block'; // Показываем статус
+
+                // Через 2-4 секунды скрываем статус
+                setTimeout(() => {
+                    statusMessage.style.display = 'none'; // Скрываем статус
+                }, Math.floor(Math.random() * 2000 + 2000));
+
+                deliveryStatusIndex++;
+                if (deliveryStatusIndex >= deliveryStatuses.length) {
+                    clearInterval(deliveryIntervalId);
+
+                    // Показываем финальное сообщение
+                    document.getElementById('delivery-status').style.display = 'block';
+                    document.getElementById('delivery-time').textContent = time;
+                }
+            }, Math.floor(Math.random() * 2000 + 2000)); // Случайное время от 2 до 4 секунд
         });
     </script>
 </body>
