@@ -12,6 +12,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             padding-top: 50px;
+            position: relative;
         }
         #animated-title {
             font-size: 4rem;
@@ -22,11 +23,32 @@
             0%, 100% { transform: translateX(-50px); }
             50% { transform: translateX(50px); }
         }
-        #status-message {
-            margin-top: 20px;
-            font-size: 1.5rem;
-            color: #007bff;
-            display: none;
+        #background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        #background-animation div {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff6f00;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: point-grow-shrink 2s infinite ease-in-out;
+        }
+        #background-animation div:nth-child(1) { top: 50%; left: 50%; }
+        #background-animation div:nth-child(2) { top: 25%; left: 25%; }
+        #background-animation div:nth-child(3) { top: 75%; left: 75%; }
+        #background-animation div:nth-child(4) { top: 25%; left: 75%; }
+        #background-animation div:nth-child(5) { top: 75%; left: 25%; }
+        @keyframes point-grow-shrink {
+            0%, 100% { transform: scale(0); }
+            50% { transform: scale(1); }
         }
         #form-container {
             margin-top: 20px;
@@ -69,14 +91,10 @@
         </div>
         <div id="delivery-animation" style="display: none;">
             <p id="status-message">Материализация начата...</p>
-            <p id="status-message">Готовим материал...</p>
-            <p id="status-message">Очень сложная работа...</p>
-            <p id="status-message">Почти всё готово...</p>
-            <p id="status-message">Материализация завершена!</p>
         </div>
         <div id="delivery-form" style="display: none;">
             <label for="address">Адрес:</label>
-            <input type="text" id="address" placeholder="Введите ваш адрес..." />
+            <input type="text" id="address" placeholder="Введите ваш адрес куда доставить заказ..." />
             <label for="time">Время доставки:</label>
             <select id="time">
                 <option value="10:00">10:00</option>
@@ -155,10 +173,10 @@
             const intervalId = setInterval(() => {
                 const statusMessage = document.getElementById('status-message');
                 statusMessage.textContent = statuses[statusIndex];
-                statusMessage.style.color = statuses[statusIndex] === 'Материализация завершена!' ? '#28a745' : '#007bff';
+                statusMessage.style.color = statuses[statusIndex] === 'Материализация завершена!' ? '#28a745' : '#ff6f00';
                 statusMessage.style.display = 'block'; // Показываем статус
 
-                // Через 2-4 секунды скрываем статус
+                // Через 2-4 секунды заменяем статус
                 setTimeout(() => {
                     statusMessage.style.display = 'none'; // Скрываем статус
                 }, Math.floor(Math.random() * 2000 + 2000));
@@ -178,7 +196,7 @@
             const time = document.getElementById('time').value;
 
             if (address === '') {
-                alert('Введите ваш адрес!');
+                alert('Введите адрес доставки заказа!');
                 return;
             }
 
@@ -201,7 +219,7 @@
                 statusMessage.style.color = '#ff6f00';
                 statusMessage.style.display = 'block'; // Показываем статус
 
-                // Через 2-4 секунды скрываем статус
+                // Через 2-4 секунды заменяем статус
                 setTimeout(() => {
                     statusMessage.style.display = 'none'; // Скрываем статус
                 }, Math.floor(Math.random() * 2000 + 2000));
